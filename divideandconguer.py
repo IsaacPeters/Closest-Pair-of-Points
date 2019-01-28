@@ -1,6 +1,7 @@
 import sys
 import math
 
+# Computes distnace between two points, passed in in the form [[x1, y1], [x2, y2]]
 def computeDistance(pointPair):
 
     # Point will come in in the form: [[xint yint], [xint, yint]], need to split this up
@@ -12,8 +13,29 @@ def computeDistance(pointPair):
     #           sqrt((x2 - x1)^2 + (y2 - y1)^2)
     return math.sqrt(math.pow(int(point2[0]) - int(point1[0]), 2) + math.pow(int(point2[1]) - int(point1[1]), 2))
 
+def merge():
+    # Nothing
+
+# Finds closest points in a list of points recursively. Points of form [x, y] given
+def recursiveSearchPoints(points):
+    if len(points) == 1:
+        return points
+
+    # First, find median x coordinate
+    median = 0
+    for point in points:
+        median += point[0]
+
+    # Call this on first and second half, to get lowest points of those halfs, then merge them
+    median = len(points) // 2 # half way point in points
+    firstHalf = recursiveSearchPoints(points[:m])
+    secondHalf = recursiveSearchPoints(points[m:])
+
+    return merge(firstHalf, secondHalf)
+
+
 if len(sys.argv) != 2: 
-    print("Incorrect number of arguments found, should be \"bruteforce <file>\"")
+    print("Incorrect number of arguments found, should be \"divideandconquer <file>\"")
 
 temp = [line.rstrip('\n') for line in open(sys.argv[1])]
 lines = [line.split() for line in temp]
@@ -30,7 +52,7 @@ for index1, line1 in enumerate(lines):
         elif computeDistance([line1, line2]) == computeDistance(lowestPoints[0]):
             lowestPoints.append([line1, line2])
 
-with open("output_bruteforce.txt", "w") as file:
+with open("output_divideandconquer.txt", "w") as file:
     file.write("%f\n" % computeDistance(lowestPoints[0]))
     for point in lowestPoints:
         file.write("%d %d %d %d\n" % (int(point[0][0]), int(point[0][1]), int(point[1][0]), int(point[1][1])))
