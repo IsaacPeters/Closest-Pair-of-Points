@@ -16,19 +16,26 @@ if len(sys.argv) != 2:
     print("Incorrect number of arguments found, should be \"bruteforce <file>\"")
 
 temp = [line.rstrip('\n') for line in open(sys.argv[1])]
-lines = [line.split() for line in temp]
+points = [line.split() for line in temp]
 
-lowestPoints = []
-lowestPoints.append([lines[0], lines[1]]) # Give default points, so we have a starting case.
-for index1, line1 in enumerate(lines):
-    for line2 in lines[index1+1:]:
+def bruteSort(points):
+    lowestPoints = []
+    lowestPoints.append([points[0], points[1]]) # Give default points, so we have a starting case.
+    for index1, point1 in enumerate(points):
+        for point2 in points[index1+1:]:
 
-        if computeDistance([line1, line2]) < computeDistance(lowestPoints[0]):
-            # First, clear all elements in our lowestPoints list
-            lowestPoints.clear()
-            lowestPoints.append([line1, line2])
-        elif computeDistance([line1, line2]) == computeDistance(lowestPoints[0]):
-            lowestPoints.append([line1, line2])
+            if computeDistance([point1, point2]) < computeDistance(lowestPoints[0]):
+                # First, clear all elements in our lowestPoints list
+                lowestPoints.clear()
+                lowestPoints.append([point1, point2])
+            elif computeDistance([point1, point2]) == computeDistance(lowestPoints[0]):
+                print("Found equal case!")
+                print([point1, point2])
+                print("\n")
+                lowestPoints.append([point1, point2])
+    return lowestPoints
+
+lowestPoints = bruteSort(points)
 
 with open("output_bruteforce.txt", "w") as file:
     file.write("%f\n" % computeDistance(lowestPoints[0]))
