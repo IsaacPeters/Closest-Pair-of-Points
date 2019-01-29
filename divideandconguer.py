@@ -101,8 +101,21 @@ def recursiveSearchPoints(points):
 
     # Check to see which pair(s) of points is closest, and then return those! woo
     crossPoints = closestCrossPair(middlePoints, lowestDistance)
-    if (crossPoints and computeDistance(crossPoints[0]) < lowestDistance):
+    if (crossPoints):
+        # if (computeDistance(crossPoints[0]) < lowestDistance):
+        print(crossPoints)
+        print("\n")
         return crossPoints
+        # if (computeDistance(crossPoints[0]) == lowestDistance):
+        #     if (lowestDistance == leftDistance):
+        #         leftClosestPoints.extend(crossPoints)
+        #         return leftClosestPoints
+        #     elif (lowestDistance == rightDistance):
+        #         rightClosestPoints.extend(crossPoints)
+        #         return rightClosestPoints
+    elif leftDistance == rightDistance:
+        leftClosestPoints.extend(rightClosestPoints)
+        return leftClosestPoints
     elif leftDistance < rightDistance:
         return leftClosestPoints
     else:
