@@ -1,6 +1,6 @@
 import sys
 import math
-
+from statistics import median
 # Computes distnace between two points, passed in in the form [[x1, y1], [x2, y2]]
 def computeDistance(pointPair):
 
@@ -17,18 +17,15 @@ def computeDistance(pointPair):
 # This is the base case, in otherwords
 def bruteSort(points):
     lowestPoints = []
-    lowestPoints.append([points[0], points[1]]) # Give default points, so we have a starting case.
-    for index1, point1 in enumerate(points, start=1):
+    for index1, point1 in enumerate(points):
         for point2 in points[index1+1:]:
-
-            if computeDistance([point1, point2]) < computeDistance(lowestPoints[0]):
+            if not lowestPoints:
+                lowestPoints.append([point1, point2])
+            elif computeDistance([point1, point2]) < computeDistance(lowestPoints[0]):
                 # First, clear all elements in our lowestPoints list
                 lowestPoints.clear()
                 lowestPoints.append([point1, point2])
             elif computeDistance([point1, point2]) == computeDistance(lowestPoints[0]):
-                print("Found equal case!")
-                print([point1, point2])
-                print("\n")
                 lowestPoints.append([point1, point2])
     return lowestPoints
 
@@ -45,37 +42,26 @@ def closestCrossPair(points, maxSeperation):
             if d < lowestCross:
                 closestPoints.clear()
                 closestPoints.append([point, points[j]])
-            elif d == maxSeperation:
+            elif d == maxSeperation and not closestPoints:
                 closestPoints.append([point, points[j]])
             j = j + 1
 
     return closestPoints
 
-def getMedian(points):
-    sortedPoints = sorted(points)
-    pointsLength = len(sortedPoints)
-    if pointsLength < 1:
-        return None
-
-    if pointsLength % 2 == 0:
-        return ( int(sortedPoints[pointsLength//2][0]) + int(sortedPoints[(pointsLength//2) - 1][0]) ) / 2
-    else:
-        return int(sortedPoints[(pointsLength-1) // 2][0])
-
-
 # Finds closest points in a list of points recursively. Points of form [x, y] given
 def recursiveSearchPoints(points):
+    # Base case, we only have 3 elements so just find the shortest distance and return it; end here.
     if len(points) <= 3:
         return bruteSort(points)
 
     # First, find median x coordinate
-    median = getMedian(points)
+    middle = median([int(p[0]) for p in points])
 
     # Split array into two halves based on median
     lowPoints = []
     highPoints = []
     for point in points:
-        if int(point[0]) <= median:
+        if int(point[0]) <= middle:
             lowPoints.append(point)
         else:
             highPoints.append(point)
@@ -93,7 +79,7 @@ def recursiveSearchPoints(points):
     # Find all the points within $lowestDistance of the median
     middlePoints = []
     for point in points:
-        if abs(int(point[0]) - median) < lowestDistance:
+        if abs(int(point[0]) - middle) < lowestDistance:
             middlePoints.append(point)
 
     # Sort points near median by y coordinate
@@ -101,8 +87,24 @@ def recursiveSearchPoints(points):
 
     # Check to see which pair(s) of points is closest, and then return those! woo
     crossPoints = closestCrossPair(middlePoints, lowestDistance)
-    if (crossPoints and computeDistance(crossPoints[0]) < lowestDistance):
-        return crossPoints
+    if (crossPoints): 
+        # We found a crosspoint, we need to check to see if it is shorter than the other points we found
+        # It could be the same, which is why we do this.
+        if (computeDistance(crossPoints[0]) < lowestDistance):
+            return crossPoints
+        if (computeDistance(crossPoints[0]) == lowestDistance):
+            if (lowestDistance == leftDistance):
+                leftClosestPoints.extend(crossPoints)
+                return leftClosestPoints
+            elif (lowestDistance == rightDistance):
+                rightClosestPoints.extend(crossPoints)
+                return rightClosestPoints
+
+    # We need to follow the same idea as ^^^ for the left and right, since the left and right branches could
+    # have found two pairs of the same distance. Easier for these.
+    elif leftDistance == rightDistance:
+        leftClosestPoints.extend(rightClosestPoints)
+        return leftClosestPoints
     elif leftDistance < rightDistance:
         return leftClosestPoints
     else:
@@ -113,6 +115,11 @@ if len(sys.argv) != 2: # Make sure we get a file argument, and only that
     print("Incorrect number of arguments found, should be \"divideandconquer <file>\"")
 lines = [line.rstrip('\n') for line in open(sys.argv[1])]
 points = [list(map(int, line.split())) for line in lines]
+
+# First, lets sort this list so that we can do things faster!
+# Sorted both by x and y
+Xsorted = sorted(points)
+Ysorted = sorted(points, key=lambda x: x[1])
 
 # Do the search!
 closestPoints = recursiveSearchPoints(points)

@@ -17,7 +17,7 @@ if len(sys.argv) != 2:
 
 temp = [line.rstrip('\n') for line in open(sys.argv[1])]
 points = [line.split() for line in temp]
-print(points)
+
 def bruteSort(points):
     lowestPoints = []
     for index1, point1 in enumerate(points):

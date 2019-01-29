@@ -50,6 +50,11 @@ def closestCrossPair(points, maxSeperation):
 
 # Finds closest points in a list of points recursively. Points of form [x, y] given
 def recursiveSearchPoints(points):
+    # Base case, we only have 3 elements so just find the shortest distance and return it; end here.
+    # if len(points) == 1:
+    #     return None
+    # elif len(points) == 2:
+    #     return points
     if len(points) <= 3:
         return bruteSort(points)
 
@@ -59,12 +64,23 @@ def recursiveSearchPoints(points):
     # Split array into two halves based on median
     lowPoints = []
     highPoints = []
-    for point in points:
-        if int(point[0]) <= middle:
+    for point in sorted(points):
+        if int(point[0]) == middle:
+            if len(lowPoints) >= len(highPoints):
+                lowPoints.append(point)
+            else:
+                highPoints.append(point)
+        elif int(point[0]) < middle:
             lowPoints.append(point)
         else:
             highPoints.append(point)
-
+    
+    # Check to make sure the splitting was even. For small numbers, we can screw up and split into a group of 1 and 3, which is bad
+    while len(lowPoints) < 2 or len(highPoints) < 2:
+        if len(lowPoints) < 2 and len(highPoints) > 2:
+            lowPoints.append(highPoints.pop())
+        elif len(highPoints) < 2 and len(lowPoints) > 2:
+            highPoints.append(lowPoints.pop())
     # Call this on first and second half, to get lowest points of those halfs, then merge them
     # This is the recursive part
     leftClosestPoints = recursiveSearchPoints(lowPoints)
@@ -108,6 +124,8 @@ def recursiveSearchPoints(points):
         return leftClosestPoints
     else:
         return rightClosestPoints
+
+# sys.setrecursionlimit(15000)
 
 # Take input from file
 if len(sys.argv) != 2: # Make sure we get a file argument, and only that
