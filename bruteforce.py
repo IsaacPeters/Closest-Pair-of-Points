@@ -17,21 +17,18 @@ if len(sys.argv) != 2:
 
 temp = [line.rstrip('\n') for line in open(sys.argv[1])]
 points = [line.split() for line in temp]
-
+print(points)
 def bruteSort(points):
     lowestPoints = []
-    lowestPoints.append([points[0], points[1]]) # Give default points, so we have a starting case.
     for index1, point1 in enumerate(points):
         for point2 in points[index1+1:]:
-
-            if computeDistance([point1, point2]) < computeDistance(lowestPoints[0]):
+            if not lowestPoints:
+                lowestPoints.append([point1, point2])
+            elif computeDistance([point1, point2]) < computeDistance(lowestPoints[0]):
                 # First, clear all elements in our lowestPoints list
                 lowestPoints.clear()
                 lowestPoints.append([point1, point2])
             elif computeDistance([point1, point2]) == computeDistance(lowestPoints[0]):
-                print("Found equal case!")
-                print([point1, point2])
-                print("\n")
                 lowestPoints.append([point1, point2])
     return lowestPoints
 
