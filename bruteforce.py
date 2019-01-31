@@ -10,26 +10,35 @@ def computeDistance(pointPair):
 
     #Distance between points P(x1, y1) and Q(x2, y2) is given by: 
     #           sqrt((x2 - x1)^2 + (y2 - y1)^2)
-    return math.sqrt(math.pow(int(point2[0]) - int(point1[0]), 2) + math.pow(int(point2[1]) - int(point1[1]), 2))
+    return math.sqrt(math.pow(point2[0] - point1[0], 2) + math.pow(point2[1] - point1[1], 2))
 
 if len(sys.argv) != 2: 
     print("Incorrect number of arguments found, should be \"bruteforce <file>\"")
 
 temp = [line.rstrip('\n') for line in open(sys.argv[1])]
-points = [line.split() for line in temp]
+points = []
+for line in temp:
+    x, y = line.split()
+    points.append((int(x), int(y)))
+
+
 
 def bruteSort(points):
     lowestPoints = []
+    minDist = -1
     for index1, point1 in enumerate(points):
         for point2 in points[index1+1:]:
-            if not lowestPoints:
-                lowestPoints.append([point1, point2])
-            elif computeDistance([point1, point2]) < computeDistance(lowestPoints[0]):
+            distance = computeDistance((point1, point2))
+            if minDist < 0:
+                minDist = distance
+                lowestPoints.append((point1, point2))
+            elif distance < minDist:
                 # First, clear all elements in our lowestPoints list
+                minDist = distance
                 lowestPoints.clear()
-                lowestPoints.append([point1, point2])
-            elif computeDistance([point1, point2]) == computeDistance(lowestPoints[0]):
-                lowestPoints.append([point1, point2])
+                lowestPoints.append((point1, point2))
+            elif distance == minDist:
+                lowestPoints.append((point1, point2))
     return lowestPoints
 
 lowestPoints = bruteSort(points)
