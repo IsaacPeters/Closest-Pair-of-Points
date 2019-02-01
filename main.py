@@ -3,11 +3,11 @@
 import os
 import time
 
-fileNames = ["hundred", "thousand", "tenThous"]#, "hundoThous"]
+fileNames = ["hundred", "thousand", "tenThous", "hundoThous", "million", "tenMillion"]
 
-# # Generate the files
-# for i, name in enumerate(fileNames, start=2):
-#         os.system("py generate.py %s %d" % (name, i))
+# Generate the files
+for i, name in enumerate(fileNames, start=2):
+        os.system("py generate.py %s %d" % (name, i))
 
 # Run brute force on files
 def runPointFinder(scriptName):
@@ -22,12 +22,17 @@ def runPointFinder(scriptName):
                         elapsedTimes.append([i, end - start])
         return elapsedTimes
 
-bruteTimes = runPointFinder("bruteforce.py")
-with open("output_bruteforceTimes.txt", "w") as file:
+bruteTimes = runPointFinder("enhanceddnc.py")
+with open("times_enhanceddnc.txt", "w") as file:
         for line in bruteTimes:
                 file.write("%d, %f\n" % (10 ** line[0], line[1]))
 
 naiveTimes = runPointFinder("divideandconquer.py")
-with open("output_divideandconquerTimes.txt", "w") as file:
+with open("times_divideandconquer.txt", "w") as file:
         for line in naiveTimes:
                 file.write("%d, \t%f\n" % (10 ** line[0], line[1]))
+
+# bruteTimes = runPointFinder("bruteforce.py")
+# with open("times_bruteforce.txt", "w") as file:
+#         for line in bruteTimes:
+#                 file.write("%d, %f\n" % (10 ** line[0], line[1]))

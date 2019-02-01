@@ -21,8 +21,6 @@ for line in temp:
     x, y = line.split()
     points.append((int(x), int(y)))
 
-
-
 def bruteSort(points):
     lowestPoints = []
     minDist = -1

@@ -11,7 +11,7 @@ def computeDistance(pointPair):
 
     #Distance between points P(x1, y1) and Q(x2, y2) is given by: 
     #           sqrt((x2 - x1)^2 + (y2 - y1)^2)
-    return math.sqrt(math.pow(int(point2[0]) - int(point1[0]), 2) + math.pow(int(point2[1]) - int(point1[1]), 2))
+    return math.sqrt(math.pow(point2[0] - point1[0], 2) + math.pow(point2[1] - point1[1], 2))
 
 # Taken from bruteforce.py, used to sort groups of 3 items for our recursive approach. 
 # This is the base case, in otherwords
@@ -37,7 +37,7 @@ def closestCrossPair(points, maxSeperation):
 
     for i, point in enumerate(points[:len(points)-2]):
         j = i + 1
-        while j < len(points) and int(points[j][1]) - int(point[1]) <= maxSeperation:
+        while j < len(points) and points[j][1] - point[1] <= maxSeperation:
             d = computeDistance([point, points[j]])
             if d < lowestCross:
                 closestPoints.clear()
@@ -54,17 +54,13 @@ def recursiveSearchPoints(points):
     if len(points) <= 3:
         return bruteSort(points)
 
-    # First, find median x coordinate
-    middle = median([int(p[0]) for p in points])
-
-    # Split array into two halves based on median
-    lowPoints = []
-    highPoints = []
-    for point in points:
-        if int(point[0]) <= middle:
-            lowPoints.append(point)
-        else:
-            highPoints.append(point)
+    # Split array into two halves: we know this is sorted so the median is actually in the middle
+    lowPoints = points[:len(points)//2]
+    highPoints = points[len(points)//2:]
+    if len(points) % 2 == 0:
+        middle = (lowPoints[-1][0] + highPoints[0][0]) / 2
+    else:
+        middle = highPoints[0][0]
 
     # Call this on first and second half, to get lowest points of those halfs, then merge them
     # This is the recursive part
@@ -77,10 +73,18 @@ def recursiveSearchPoints(points):
     lowestDistance = min(leftDistance, rightDistance)
 
     # Find all the points within $lowestDistance of the median
+    # We can start in the center and work outwards, ezpz
     middlePoints = []
-    for point in points:
-        if abs(int(point[0]) - middle) < lowestDistance:
+    for point in reversed(lowPoints): # First do the lowest points
+        if abs(point[0] - middle) < lowestDistance:
             middlePoints.append(point)
+        else:
+            break
+    for point in highPoints: # Now to highest points
+        if abs(point[0] - middle) < lowestDistance:
+            middlePoints.append(point)
+        else:
+            break
 
     # Sort points near median by y coordinate
     middlePoints.sort(key=lambda x: x[1])
@@ -112,19 +116,21 @@ def recursiveSearchPoints(points):
 
 # Take input from file
 if len(sys.argv) != 2: # Make sure we get a file argument, and only that
-    print("Incorrect number of arguments found, should be \"divideandconquer <file>\"")
-lines = [line.rstrip('\n') for line in open(sys.argv[1])]
-points = [list(map(int, line.split())) for line in lines]
+    print("Incorrect number of arguments found, should be \"enhanceddnc <file>\"")
+temp = [line.rstrip('\n') for line in open(sys.argv[1])]
+points = []
+for line in temp:
+    x, y = line.split()
+    points.append((int(x), int(y)))
 
 # First, lets sort this list so that we can do things faster!
-# Sorted both by x and y
-Xsorted = sorted(points)
-Ysorted = sorted(points, key=lambda x: x[1])
+# Sorted both by x, then y
+points.sort(key = lambda element: (element[0], element[1]))
 
 # Do the search!
 closestPoints = recursiveSearchPoints(points)
 
-with open("output_divideandconquer.txt", "w") as file:
+with open("output_enhanceddnc.txt", "w") as file:
     file.write("%f\n" % computeDistance(closestPoints[0]))
     for point in closestPoints:
-        file.write("%d %d %d %d\n" % (int(point[0][0]), int(point[0][1]), int(point[1][0]), int(point[1][1])))
+        file.write("%d %d %d %d\n" % (point[0][0], point[0][1], point[1][0], point[1][1]))
