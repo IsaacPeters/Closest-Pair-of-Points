@@ -112,3 +112,14 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+gen/tenMillion0
+gen/tenMillion1
+gen/tenMillion2
+gen/tenMillion3
+gen/tenMillion4
+gen/tenMillion5
+gen/tenMillion6
+gen/tenMillion7
+gen/tenMillion8
+gen/tenMillion9
+*.txt
