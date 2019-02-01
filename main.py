@@ -3,11 +3,11 @@
 import os
 import time
 
-fileNames = ["hundred", "thousand", "tenThous", "hundoThous", "million", "tenMillion"]
+fileNames = ["hundred", "thousand", "tenThous", "hundoThous", "million",]# "tenMillion"]
 
 # Generate the files
-for i, name in enumerate(fileNames, start=2):
-        os.system("py generate.py %s %d" % (name, i))
+# for i, name in enumerate(fileNames, start=2):
+#         os.system("py generate.py %s %d" % (name, i))
 
 # Run brute force on files
 def runPointFinder(scriptName):

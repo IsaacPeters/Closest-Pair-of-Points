@@ -15,7 +15,7 @@ def computeDistance(pointPair):
 
 # Taken from bruteforce.py, used to sort groups of 3 items for our recursive approach. 
 # This is the base case, in otherwords
-def bruteSort(points):
+def bruteSearch(points):
     lowestPoints = []
     for index1, point1 in enumerate(points):
         for point2 in points[index1+1:]:
@@ -49,45 +49,49 @@ def closestCrossPair(points, maxSeperation):
     return closestPoints
 
 # Finds closest points in a list of points recursively. Points of form [x, y] given
-def recursiveSearchPoints(points):
+def recursiveSearchPoints(pointsX, pointsY):
     # Base case, we only have 3 elements so just find the shortest distance and return it; end here.
-    if len(points) <= 3:
-        return bruteSort(points)
+    if len(pointsX) <= 3:
+        return bruteSearch(pointsX)
 
     # Split array into two halves: we know this is sorted so the median is actually in the middle
-    lowPoints = points[:len(points)//2]
-    highPoints = points[len(points)//2:]
-    if len(points) % 2 == 0:
-        middle = (lowPoints[-1][0] + highPoints[0][0]) / 2
+    lowPointsX = pointsX[:len(pointsX)//2]
+    highPointsX = pointsX[len(pointsX)//2:]
+    if len(pointsX) % 2 == 0:
+        middle = (lowPointsX[-1][0] + highPointsX[0][0]) / 2
     else:
-        middle = highPoints[0][0]
+        middle = highPointsX[0][0]
+
+    lowPointsY = []
+    highPointsY = []
+    for point in pointsY:
+        if point[0] == middle:
+            if len(lowPointsY) >= len(highPointsY):
+                lowPointsY.append(point)
+            else:
+                highPointsY.append(point)
+        elif point[0] < middle:
+            lowPointsY.append(point)
+        else:
+            highPointsY.append(point)
 
     # Call this on first and second half, to get lowest points of those halfs, then merge them
     # This is the recursive part
-    leftClosestPoints = recursiveSearchPoints(lowPoints)
-    rightClosestPoints = recursiveSearchPoints(highPoints)
+    leftClosestPoints = recursiveSearchPoints(lowPointsX, lowPointsY)
+    rightClosestPoints = recursiveSearchPoints(highPointsX, highPointsY)
 
     # Calculate distances based off returned closest points
     leftDistance = computeDistance(leftClosestPoints[0])
     rightDistance = computeDistance(rightClosestPoints[0])
     lowestDistance = min(leftDistance, rightDistance)
 
-    # Find all the points within $lowestDistance of the median
-    # We can start in the center and work outwards, ezpz
+    # Go through our Y sorted list and pick our the middle points, sorted by Y
     middlePoints = []
-    for point in reversed(lowPoints): # First do the lowest points
-        if abs(point[0] - middle) < lowestDistance:
+    for point in pointsY:
+        # Check to see if it's within the range of points, and within
+        # minDistance of our median
+        if point[0] >= pointsX[0][0] and point[0] <= pointsX[0][0] and abs(point[0] - middle) < lowestDistance:
             middlePoints.append(point)
-        else:
-            break
-    for point in highPoints: # Now to highest points
-        if abs(point[0] - middle) < lowestDistance:
-            middlePoints.append(point)
-        else:
-            break
-
-    # Sort points near median by y coordinate
-    middlePoints.sort(key=lambda x: x[1])
 
     # Check to see which pair(s) of points is closest, and then return those! woo
     crossPoints = closestCrossPair(middlePoints, lowestDistance)
@@ -126,9 +130,10 @@ for line in temp:
 # First, lets sort this list so that we can do things faster!
 # Sorted both by x, then y
 points.sort(key = lambda element: (element[0], element[1]))
+pointsByY = sorted(points, key=lambda y: y[1])
 
 # Do the search!
-closestPoints = recursiveSearchPoints(points)
+closestPoints = recursiveSearchPoints(points, pointsByY)
 
 with open("output_enhanceddnc.txt", "w") as file:
     file.write("%f\n" % computeDistance(closestPoints[0]))
